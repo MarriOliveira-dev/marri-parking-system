@@ -1,0 +1,287 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .park-wrap { padding: 1rem 0; }
+  .park-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .park-logo { width: 40px; height: 40px; border-radius: 50%; background: #a5789a; display: flex; align-items: center; justify-content: center; }
+  .park-logo svg {
+  width: 18px;
+  height: 18px;
+  fill: white; }
+  .park-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .park-sub { font-size: 13px; color: var(--color-text-secondary); }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
+  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-value.green { color: #a5789a; }
+  .tabs { display: flex; gap: 0; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; margin-bottom: 1.5rem; width: fit-content; }
+  .tab { padding: 8px 20px; font-size: 14px; cursor: pointer; background: transparent; border: none; color: var(--color-text-secondary); transition: all 0.15s; }
+  .tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; }
+  .tab:hover:not(.active) { background: var(--color-background-secondary); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .form-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; }
+  .form-section { margin-bottom: 1.25rem; }
+  .form-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; display: block; }
+  .seg-group { display: flex; gap: 0; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; flex-wrap: wrap; }
+  .seg-btn { padding: 8px 14px; font-size: 13px; cursor: pointer; background: transparent; border: none; color: var(--color-text-secondary); transition: all 0.15s; border-right: 0.5px solid var(--color-border-tertiary); }
+  .seg-btn:last-child { border-right: none; }
+  .seg-btn.selected { background: #a5789a; color: white; font-weight: 500; }
+  .seg-btn:hover:not(.selected) { background: var(--color-background-secondary); }
+  .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .time-block { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
+  .time-block-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px; }
+  .time-inputs { display: flex; align-items: center; gap: 6px; }
+  .time-input { width: 52px; text-align: center; font-size: 16px; font-weight: 500; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 4px; color: var(--color-text-primary); }
+  .time-sep { font-size: 18px; font-weight: 500; color: var(--color-text-secondary); }
+  .calc-btn { width: 100%; padding: 12px; background: #a5789a; color: white; border: none; border-radius: var(--border-radius-md); font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; margin-top: 0.25rem; }
+  .calc-btn:hover { opacity: 0.88; }
+  .result-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-top: 1rem; display: none; }
+  .result-card.show { display: block; }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 14px; }
+  .result-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .result-key { color: var(--color-text-secondary); }
+  .result-val { font-weight: 500; color: var(--color-text-primary); }
+  .result-val.big { font-size: 22px; color: #a5789a; }
+  .result-val.zero { color: #a5789a; }
+  .alert { padding: 10px 14px; border-radius: var(--border-radius-md); font-size: 13px; margin-top: 10px; display: none; }
+  .alert.show { display: block; }
+  .alert.error { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #F09595; }
+  .alert.info { background: #E1F5EE; color: #a5789a; border: 0.5px solid #a5789a; }
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+  .report-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .report-card-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .report-card-val { font-size: 26px; font-weight: 500; color: var(--color-text-primary); }
+  .report-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 11px; padding: 3px 8px; border-radius: 999px; }
+  .badge-moto { background: #E1F5EE; color: #0F6E56; }
+  .badge-car { background: #E6F1FB; color: #185FA5; }
+  .badge-truck { background: #FAEEDA; color: #854F0B; }
+  .badge-free { background: #FAECE7; color: #993C1D; }
+  .chart-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; }
+  .chart-title { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+  .bar-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { font-size: 13px; color: var(--color-text-secondary); width: 80px; text-align: right; }
+  .bar-track { flex: 1; height: 22px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 12px; font-weight: 500; color: white; transition: width 0.5s ease; min-width: 0; }
+  .bar-num { font-size: 13px; font-weight: 500; color: var(--color-text-primary); width: 28px; }
+  .empty-state { text-align: center; padding: 2rem; color: var(--color-text-secondary); font-size: 14px; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+  .history-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .history-info { flex: 1; }
+  .history-type { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .history-detail { font-size: 12px; color: var(--color-text-secondary); }
+  .history-price { font-size: 15px; font-weight: 500; color: #a5789a; }
+  .history-price.free { color: #a5789a; }
+</style>
+
+<div class="park-wrap">
+  <div class="park-header">
+  <div class="park-logo">
+    <svg viewBox="0 0 24 24">
+    <path d="M5 11l1.5-4.5C6.8 5.6 7.6 5 8.5 5h7c.9 0 1.7.6 2 1.5L19 11h1c.6 0 1 .4 1 1v5c0 .6-.4 1-1 1h-1.2c-.4 1.2-1.5 2-2.8 2s-2.4-.8-2.8-2H10.8c-.4 1.2-1.5 2-2.8 2s-2.4-.8-2.8-2H4c-.6 0-1-.4-1-1v-5c0-.6.4-1 1-1h1zm3.5-4L7.3 11h9.4l-1.2-4h-7zM8 18.5c.8 0 1.5-.7 1.5-1.5S8.8 15.5 8 15.5 6.5 16.2 6.5 17 7.2 18.5 8 18.5zm8 0c.8 0 1.5-.7 1.5-1.5s-.7-1.5-1.5-1.5-1.5.7-1.5 1.5.7 1.5 1.5 1.5z"/>
+  </svg>
+</div> 
+   
+      <div class="park-title">Marri Parking System</div>
+      <div class="park-sub">Sistema de controle de estacionamento inteligente </div>
+    </div>
+  </div>
+
+  <div class="metrics" id="metrics">
+    <div class="metric"><div class="metric-label">Motos</div><div class="metric-value" id="m-motos">0</div></div>
+    <div class="metric"><div class="metric-label">Carros</div><div class="metric-value" id="m-carros">0</div></div>
+    <div class="metric"><div class="metric-label">Caminhonetes</div><div class="metric-value" id="m-caminhonetes">0</div></div>
+    <div class="metric"><div class="metric-label">Isentos</div><div class="metric-value" id="m-isentos">0</div></div>
+    <div class="metric"><div class="metric-label">Total arrecadado</div><div class="metric-value green" id="m-total">R$ 0,00</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('registro')">Registrar veículo</button>
+    <button class="tab" onclick="switchTab('relatorio')">Relatório</button>
+  </div>
+
+  <div class="panel active" id="panel-registro">
+    <div class="form-card">
+      <div class="form-section">
+        <span class="form-label">Dia da semana</span>
+        <div class="seg-group" id="dias">
+          <button class="seg-btn" onclick="selDia(this,1)">Seg</button>
+          <button class="seg-btn" onclick="selDia(this,2)">Ter</button>
+          <button class="seg-btn" onclick="selDia(this,3)">Qua</button>
+          <button class="seg-btn" onclick="selDia(this,4)">Qui</button>
+          <button class="seg-btn" onclick="selDia(this,5)">Sex</button>
+          <button class="seg-btn" onclick="selDia(this,6)">Sáb</button>
+          <button class="seg-btn" onclick="selDia(this,7)">Dom</button>
+        </div>
+      </div>
+      <div class="form-section">
+        <span class="form-label">Tipo de veículo</span>
+        <div class="seg-group" id="tipos">
+          <button class="seg-btn" onclick="selTipo(this,1)">Moto</button>
+          <button class="seg-btn" onclick="selTipo(this,2)">Carro</button>
+          <button class="seg-btn" onclick="selTipo(this,3)">Caminhonete</button>
+        </div>
+      </div>
+      <div class="form-section">
+        <span class="form-label">Horários (08:00 – 18:00)</span>
+        <div class="time-row">
+          <div class="time-block">
+            <div class="time-block-label">Entrada</div>
+            <div class="time-inputs">
+              <input class="time-input" type="number" id="h-entrada" min="8" max="18" value="8" placeholder="HH">
+              <span class="time-sep">:</span>
+              <input class="time-input" type="number" id="m-entrada" min="0" max="59" value="0" placeholder="MM">
+            </div>
+          </div>
+          <div class="time-block">
+            <div class="time-block-label">Saída</div>
+            <div class="time-inputs">
+              <input class="time-input" type="number" id="h-saida" min="8" max="18" value="9" placeholder="HH">
+              <span class="time-sep">:</span>
+              <input class="time-input" type="number" id="m-saida" min="0" max="59" value="0" placeholder="MM">
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="registrar()">Registrar e calcular</button>
+      <div class="alert error" id="alerta-erro"></div>
+      <div class="result-card" id="resultado">
+        <div class="result-row"><span class="result-key">Tipo de veículo</span><span class="result-val" id="r-tipo">—</span></div>
+        <div class="result-row"><span class="result-key">Dia</span><span class="result-val" id="r-dia">—</span></div>
+        <div class="result-row"><span class="result-key">Permanência</span><span class="result-val" id="r-tempo">—</span></div>
+        <div class="result-row"><span class="result-key">Valor cobrado</span><span class="result-val big" id="r-valor">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-relatorio">
+    <div class="report-grid">
+      <div class="report-card">
+        <div class="report-card-label">Total de veículos</div>
+        <div class="report-card-val" id="r-total-veiculos">0</div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-label">Total arrecadado</div>
+        <div class="report-card-val" id="r-arrecadado">R$ 0,00</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="margin-bottom: 1rem;">
+      <div class="chart-title">Veículos por tipo</div>
+      <div id="chart-bars">
+        <div class="empty-state">Nenhum veículo registrado ainda.</div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Histórico de registros</div>
+      <div class="history-list" id="historico">
+        <div class="empty-state">Nenhum registro ainda.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let state = { motos:0, carros:0, caminhonetes:0, isentos:0, total:0, history:[] };
+  let selDiaVal = null, selTipoVal = null;
+  const dias = ['','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+  const tipos = ['','Moto','Carro','Caminhonete'];
+  const tipoIcons = ['','🛵','🚗','🚙'];
+  const tipoBg = ['','#E1F5EE','#E6F1FB','#FAEEDA'];
+  const tipoColor = ['','#0F6E56','#185FA5','#854F0B'];
+  const tipoBar = ['','#1D9E75','#378ADD','#EF9F27'];
+
+  function switchTab(t) {
+    document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['registro','relatorio'][i]===t));
+    document.querySelectorAll('.panel').forEach((el,i) => el.classList.toggle('active', ['panel-registro','panel-relatorio'][i]==='panel-'+t));
+    if(t==='relatorio') updateRelatorio();
+  }
+
+  function selDia(el, v) {
+    document.querySelectorAll('#dias .seg-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected'); selDiaVal = v;
+  }
+  function selTipo(el, v) {
+    document.querySelectorAll('#tipos .seg-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected'); selTipoVal = v;
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('alerta-erro');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 4000);
+  }
+
+  function registrar() {
+    document.getElementById('resultado').classList.remove('show');
+    document.getElementById('alerta-erro').classList.remove('show');
+    if(!selDiaVal) return showErr('Selecione o dia da semana.');
+    if(selDiaVal===7) return showErr('O estacionamento não funciona aos domingos.');
+    if(!selTipoVal) return showErr('Selecione o tipo do veículo.');
+    const hE=+document.getElementById('h-entrada').value, mE=+document.getElementById('m-entrada').value;
+    const hS=+document.getElementById('h-saida').value, mS=+document.getElementById('m-saida').value;
+    if(hE<8||hE>18||hS<8||hS>18||mE<0||mE>59||mS<0||mS>59||(hE===18&&mE>0)||(hS===18&&mS>0))
+      return showErr('Horário inválido. Funcionamento das 8h às 18h.');
+    const minEnt=hE*60+mE, minSai=hS*60+mS;
+    if(minSai<=minEnt) return showErr('Horário de saída deve ser após a entrada.');
+    const tempo = minSai - minEnt;
+    let valor = 0;
+    if(tempo<=15){ valor=0; state.isentos++; }
+    else if(tempo<=60){ valor=1.50; }
+    else {
+      let extra = Math.ceil((tempo-60)/60);
+      valor = 1.50 + extra*1.00;
+    }
+    if(selTipoVal===1) state.motos++;
+    else if(selTipoVal===2) state.carros++;
+    else state.caminhonetes++;
+    state.total += valor;
+    state.history.unshift({ tipo:selTipoVal, dia:selDiaVal, tempo, valor });
+    updateMetrics();
+    const r = document.getElementById('resultado');
+    document.getElementById('r-tipo').textContent = tipos[selTipoVal];
+    document.getElementById('r-dia').textContent = dias[selDiaVal];
+    document.getElementById('r-tempo').textContent = tempo + ' min (' + Math.floor(tempo/60) + 'h ' + (tempo%60) + 'min)';
+    const rv = document.getElementById('r-valor');
+    rv.textContent = 'R$ ' + valor.toFixed(2).replace('.',',');
+    rv.className = 'result-val big' + (valor===0?' zero':'');
+    r.classList.add('show');
+  }
+
+  function updateMetrics() {
+    document.getElementById('m-motos').textContent = state.motos;
+    document.getElementById('m-carros').textContent = state.carros;
+    document.getElementById('m-caminhonetes').textContent = state.caminhonetes;
+    document.getElementById('m-isentos').textContent = state.isentos;
+    document.getElementById('m-total').textContent = 'R$ ' + state.total.toFixed(2).replace('.',',');
+  }
+
+  function updateRelatorio() {
+    const total = state.motos+state.carros+state.caminhonetes;
+    document.getElementById('r-total-veiculos').textContent = total;
+    document.getElementById('r-arrecadado').textContent = 'R$ '+state.total.toFixed(2).replace('.',',');
+    const barsEl = document.getElementById('chart-bars');
+    if(total===0){ barsEl.innerHTML='<div class="empty-state">Nenhum veículo registrado ainda.</div>'; }
+    else {
+      const max = Math.max(state.motos,state.carros,state.caminhonetes,1);
+      const data = [[1,'Motos',state.motos],[2,'Carros',state.carros],[3,'Caminhonetes',state.caminhonetes]];
+      barsEl.innerHTML = data.map(([t,lbl,n]) =>
+        `<div class="bar-item"><span class="bar-label">${lbl}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%;background:${tipoBar[t]};">${n>0?n:''}</div></div><span class="bar-num">${n}</span></div>`
+      ).join('');
+    }
+    const histEl = document.getElementById('historico');
+    if(state.history.length===0){ histEl.innerHTML='<div class="empty-state">Nenhum registro ainda.</div>'; return; }
+    histEl.innerHTML = state.history.slice(0,20).map(h =>
+      `<div class="history-item">
+        <div class="history-icon" style="background:${tipoBg[h.tipo]};color:${tipoColor[h.tipo]};font-size:16px;">${tipoIcons[h.tipo]}</div>
+        <div class="history-info">
+          <div class="history-type">${tipos[h.tipo]} — ${dias[h.dia]}</div>
+          <div class="history-detail">${h.tempo} min de permanência</div>
+        </div>
+        <div class="history-price${h.valor===0?' free':''}">${h.valor===0?'Isento':'R$ '+h.valor.toFixed(2).replace('.',',')}</div>
+      </div>`
+    ).join('');
+  }
+</script>
